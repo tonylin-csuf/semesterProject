@@ -16,11 +16,17 @@ namespace EventManagement.Api.Services
             return _users.FirstOrDefault(u => u.Id == id);
         }
 
-        public User CreateUser(User input)
+        public User CreateUser(User request)
         {
-            input.Id = Guid.NewGuid();
-            _users.Add(input);
-            return input;
+        var user = new User
+            {
+                Id = Guid.NewGuid(),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                CreatedAt = DateTime.UtcNow
+            };
+        return _userRepository.Add(user);
         }
     }
 }

@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -12,12 +10,20 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Events
 builder.Services.AddScoped<EventManagement.Api.Repositories.IEventRepository, EventManagement.Api.Repositories.EventRepository>();
 builder.Services.AddScoped<EventManagement.Api.Services.IEventService, EventManagement.Api.Services.EventService>();
 
+// Users
+builder.Services.AddScoped<EventManagement.Api.Repositories.IUserRepository, EventManagement.Api.Repositories.UserRepository>();
+builder.Services.AddScoped<EventManagement.Api.Services.IUserService, EventManagement.Api.Services.UserService>();
+
+// Registrations
+builder.Services.AddScoped<EventManagement.Api.Repositories.IRegistrationRepository, EventManagement.Api.Repositories.RegistrationRepository>();
+builder.Services.AddScoped<EventManagement.Api.Services.IRegistrationService, EventManagement.Api.Services.RegistrationService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -25,7 +31,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.MapControllers();
-
 app.Run();

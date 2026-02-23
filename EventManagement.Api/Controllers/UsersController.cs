@@ -38,9 +38,15 @@ namespace EventManagement.Api.Controllers
         [HttpPost]
         public ActionResult<User> CreateUser([FromBody] User input)
         {
-            var newUser = _userService.CreateUser(input);
-            return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
+            if (string.IsNullOrWhiteSpace(input.FirstName))
+                return BadRequest("FirstName is required.");
+            if (string.IsNullOrWhiteSpace(input.LastName))
+                return BadRequest("LastName is required.");
+            if (string.IsNullOrWhiteSpace(input.Email))
+                return BadRequest("Email is required.");
 
+            var created = _userService.CreateUser(input);
+            return CreatedAtAction(nameof(GetUserById), new { id = created.Id }, created);
         }
 
     }
