@@ -2,46 +2,52 @@ using Microsoft.AspNetCore.Mvc;
 using EventManagement.Api.Models;
 using EventManagement.Api.Services;
 
-namespace EventManagement.Api.Controllers
+namespace EventManagement.Api.Controllers;
+
+[ApiController]
+[Route("api/events")]
+public class EventsController : ControllerBase
 {
+    private readonly IEventService _eventService;
 
-    [ApiController]
-    [Route("api/events")]
-
-    public class EventsController : ControllerBase
+    public EventsController(IEventService eventService)
     {
-        private readonly IEventService _eventService;
+        _eventService = eventService;
+    }
 
-        public EventsController()
+    [HttpGet]
+    public ActionResult<IEnumerable<Event>> GetEvents()
+    {
+        var events = _eventService.GetEvents();
+        return Ok(events);
+    }
+
+    [HttpGet("{id:guid}")]
+    public ActionResult<Event> GetEventById(Guid id)
+    {
+        var ev = _eventService.GetEventById(id);
+        if (ev is null)
         {
-            _eventService = new EventService();
+            return NotFound();
         }
 
-        [HttpGet]
-        public ActionResult<List<Event>> GetEvents()
+        return Ok(ev);
+    }
+
+    [HttpPost]
+    public ActionResult<Event> CreateEvent([FromBody] Event input)
+    {
+        if (string.IsNullOrWhiteSpace(input.Title))
         {
-            return Ok(_eventService.GetEvents());
+            return BadRequest("Title is required.");
         }
 
-
-        [HttpGet("{id:guid}")]
-        public ActionResult<Event> GetEventById(Guid id)
+        if (input.EndDateTime <= input.StartDateTime)
         {
-            var _event = _eventService.GetEventById(id);
-
-            if (_event == null)
-                return NotFound();
-
-            return Ok(_event);
+            return BadRequest("EndDateTime must be after StartDateTime.");
         }
 
-        [HttpPost]
-        public ActionResult<Event> CreateEvent([FromBody] Event input)
-        {
-            var newEvent = _eventService.CreateEvent(input);
-            return CreatedAtAction(nameof(GetEventById), new { id = newEvent.Id }, newEvent);
-
-        }
-
+        var created = _eventService.CreateEvent(input);
+        return CreatedAtAction(nameof(GetEventById), new { id = created.Id }, created);
     }
 }
