@@ -10,5 +10,6 @@ namespace EventManagement.Api.Models
         public DateTime EndDateTime { get; set; }
         public string Location { get; set; } = string.Empty;
         public int Capacity { get; set; }
+        public ICollection<Registration> Registrations { get; set; } = new List<Registration>();
     }
 }
